@@ -1,0 +1,3 @@
+export const SET_DATA_LIST = 'SET_DATA_LIST'
+export const CLEAR_DATA_LIST = 'CLEAR_DATA_LIST'
+export const FETCH_DATA_LIST = 'FETCH_DATA_LIST'
