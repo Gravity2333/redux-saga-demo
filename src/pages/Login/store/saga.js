@@ -1,7 +1,8 @@
-import { select, put, take, call, all } from "redux-saga/effects";
+import { put, take, all } from "redux-saga/effects";
 import { LOGIN, LOGOUT } from "./constants";
 import { LogoutUser, authorize } from "../services";
 import { clearUserInfoAction, setUserInfoAction } from "./actionCreators";
+import { call } from "../../../tools/effects";
 
 function* loginWatcher() {
   while (true) {
