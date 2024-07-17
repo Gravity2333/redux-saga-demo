@@ -1,13 +1,11 @@
+import { takeLeading, take } from "redux-saga/effects";
 import {
-  put,
   takeEvery,
   takeLatest,
-  takeLeading,
-  throttle,
-  select,
   call,
-  take,
-} from "redux-saga/effects";
+  put,
+  throttle,
+} from "../../../tools/sagaMiddleWare";
 import {
   TRIGGER_TAKEEVERY_JOB,
   TRIGGER_TAKELATEST_JOB,
@@ -34,19 +32,19 @@ export function* taskResSaga() {
     yield put(AddSagaTaskAction(TRIGGER_TAKELEADING_JOB, info));
   });
 
-  yield throttle(2000, TRIGGER_THROTTLE_JOB, function* () {
+  yield throttle(TRIGGER_THROTTLE_JOB, function* () {
     const info = yield call(queryTaskInfo, TRIGGER_THROTTLE_JOB);
     yield put(AddSagaTaskAction(TRIGGER_THROTTLE_JOB, info));
   });
 
-  let takeCnt = 0;
-  while (true) {
-    const res = yield take(TRIGGER_TAKE_JOB);
-    console.log(res)
-    if (++takeCnt === 3) {
-      takeCnt = 0;
-      const info = yield call(queryTaskInfo, TRIGGER_TAKE_JOB);
-      yield put(AddSagaTaskAction(TRIGGER_TAKE_JOB, info));
-    }
-  }
+  // let takeCnt = 0;
+  // while (true) {
+  //   const res = yield take(TRIGGER_TAKE_JOB);
+  //   console.log(res);
+  //   if (++takeCnt === 3) {
+  //     takeCnt = 0;
+  //     const info = yield call(queryTaskInfo, TRIGGER_TAKE_JOB);
+  //     yield put(AddSagaTaskAction(TRIGGER_TAKE_JOB, info));
+  //   }
+  // }
 }

@@ -1,8 +1,7 @@
-import { takeEvery, put } from "redux-saga/effects";
 import { FETCH_HEADER_INFO } from "./constants";
 import { queryHeaderInfo } from "../services";
 import { setHeaderInfoAction } from "./actionCreators";
-import { call } from "../../../tools/effects";
+import { takeEvery, put, call } from "../../../tools/sagaMiddleWare";
 
 export default function* headerSaga() {
   yield takeEvery(FETCH_HEADER_INFO, function* () {

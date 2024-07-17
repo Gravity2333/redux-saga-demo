@@ -1,4 +1,4 @@
-import { runAsyncGrnerator } from "./runGenerator";
+import { runAsyncGrnerator, runAsyncIterator } from "./runGenerator";
 
 // 使用函数对象的Symbol.toStringTag是否等于 GeneratorFunction来判断函数是不是生成器
 export function isGeneratorFunction(func) {
@@ -28,3 +28,10 @@ export function call(func, ...args) {
     return func(...args);
   }
 }
+
+export function all(generators = []) {
+  generators.forEach((generator) => {
+    runAsyncIterator(generator);
+  });
+}
+

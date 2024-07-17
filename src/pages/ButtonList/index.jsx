@@ -38,9 +38,9 @@ function ButtonList({
       <button onClick={triggerLatest}>
         takeLatest执行异步任务 请求返回 400ms
       </button>
-      <button onClick={triggerLeading}>
+      {/* <button onClick={triggerLeading}>
         takeLeading执行异步任务 请求返回 1s
-      </button>
+      </button> */}
       <button onClick={triggerThrottle}>throttle执行异步任务 截流时间2s</button>
       <button onClick={triggerTake}>take执行异步任务 点击三次之后增加任务</button>
     </div>
