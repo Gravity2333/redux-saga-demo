@@ -8,8 +8,7 @@ export default function* defSaga() {
   yield all([
     headerSaga(),
     taskResSaga(),
-  //   // taskResSaga(),
-  //   // userSaga(),
-  //   // dataSaga(),
+    userSaga(),
+    dataSaga(),
   ])
 }

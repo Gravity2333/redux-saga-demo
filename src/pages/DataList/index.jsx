@@ -1,6 +1,5 @@
 import { connect } from "my-redux-connect"
 import { fetchDataListAction } from "./store/actionCreators"
-import { useEffect } from "react"
 
 // 展示一下select的使用
 function DataList({dataInfos,fetch}){

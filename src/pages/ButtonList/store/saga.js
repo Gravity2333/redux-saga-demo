@@ -1,10 +1,11 @@
-import { takeLeading, take } from "redux-saga/effects";
 import {
   takeEvery,
   takeLatest,
   call,
   put,
   throttle,
+  take,
+  takeLeading
 } from "../../../tools/sagaMiddleWare";
 import {
   TRIGGER_TAKEEVERY_JOB,
@@ -18,33 +19,33 @@ import { AddSagaTaskAction } from "./actionCreators";
 
 export function* taskResSaga() {
   yield takeEvery(TRIGGER_TAKEEVERY_JOB, function* () {
-    const info = yield call(queryTaskInfo, TRIGGER_TAKEEVERY_JOB);
+    const info = yield call(queryTaskInfo, TRIGGER_TAKEEVERY_JOB,2000);
     yield put(AddSagaTaskAction(TRIGGER_TAKEEVERY_JOB, info));
   });
 
   yield takeLatest(TRIGGER_TAKELATEST_JOB, function* () {
-    const info = yield call(queryTaskInfo, TRIGGER_TAKELATEST_JOB);
+    const info = yield call(queryTaskInfo, TRIGGER_TAKELATEST_JOB,2000);
     yield put(AddSagaTaskAction(TRIGGER_TAKELATEST_JOB, info));
   });
 
   yield takeLeading(TRIGGER_TAKELEADING_JOB, function* () {
-    const info = yield call(queryTaskInfo, TRIGGER_TAKELEADING_JOB, 1000);
+    const info = yield call(queryTaskInfo, TRIGGER_TAKELEADING_JOB, 3000);
     yield put(AddSagaTaskAction(TRIGGER_TAKELEADING_JOB, info));
   });
 
-  yield throttle(TRIGGER_THROTTLE_JOB, function* () {
+  yield throttle(2000,TRIGGER_THROTTLE_JOB, function* () {
     const info = yield call(queryTaskInfo, TRIGGER_THROTTLE_JOB);
     yield put(AddSagaTaskAction(TRIGGER_THROTTLE_JOB, info));
   });
 
-  // let takeCnt = 0;
-  // while (true) {
-  //   const res = yield take(TRIGGER_TAKE_JOB);
-  //   console.log(res);
-  //   if (++takeCnt === 3) {
-  //     takeCnt = 0;
-  //     const info = yield call(queryTaskInfo, TRIGGER_TAKE_JOB);
-  //     yield put(AddSagaTaskAction(TRIGGER_TAKE_JOB, info));
-  //   }
-  // }
+  let takeCnt = 0;
+  while (true) {
+    const res = yield take(TRIGGER_TAKE_JOB);
+    console.log(res);
+    if (++takeCnt === 3) {
+      takeCnt = 0;
+      const info = yield call(queryTaskInfo, TRIGGER_TAKE_JOB);
+      yield put(AddSagaTaskAction(TRIGGER_TAKE_JOB, info));
+    }
+  }
 }

@@ -35,7 +35,7 @@ export function runAsyncGrnerator(generatorFunc, ...args) {
   return Promise.resolve().then(handleRun);
 }
 
-export function runAsyncIterator(iterator, ...args) {
+export function runAsyncIterator(iterator) {
   function handleRun(value) {
     const iteratorResult = iterator.next(value);
     if (iteratorResult.done) {

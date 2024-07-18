@@ -1,10 +1,11 @@
-import { debounce, throttle } from "./functional";
-import { runAsyncGrnerator } from "./runGenerator";
+import { runAsyncGrnerator, runAsyncIterator } from "./runGenerator";
 
 export const _listenerType = {
   TAKE_EVERY: "TAKE_EVERY",
   TAKE_LATEST: "TAKE_LATEST",
   THROTTLE: "THROTTLE",
+  TAKE_LEADING: "TAKE_LEADING",
+  TAKE: "TAKE",
 };
 
 export class EventEmitter {
@@ -53,32 +54,103 @@ export class EventEmitter {
     this.eventKeys.add(eventName);
   }
 
-  emitLatest = debounce((eventName, ...args) => {
-    const listeners = this.event[eventName] || [];
-    listeners
-      .filter(({ type }) => type === _listenerType.TAKE_LATEST)
-      .forEach(({ listener }) => {
-        runAsyncGrnerator(listener, ...args);
-      });
-  }, 500);
+  _cancelRunningIteratorIfExist(listenerObj) {
+    if (listenerObj.runningIterator) {
+      listenerObj.runningIterator.return();
+      listenerObj.runningIterator = null;
+    }
+  }
 
-  onThrottle(eventName, listener) {
+  emitLatest(eventName, ...args) {
+    const listeners = this.event[eventName] || [];
+    const canelIterator = this._cancelRunningIteratorIfExist
+    runAsyncGrnerator(function* () {
+      const leadingListeners = listeners.filter(
+        ({ type }) => type === _listenerType.TAKE_LATEST
+      );
+
+      for (const listenerObj of leadingListeners) {
+        canelIterator(listenerObj);
+        const iterator = listenerObj.listener(...args);
+        listenerObj.runningIterator = iterator;
+        yield runAsyncIterator(iterator);
+        listenerObj.runningIterator = null;
+      }
+    });
+  }
+
+  onThrottle(time, eventName, listener) {
     if (!this.event[eventName]) {
       this.event[eventName] = [];
     }
     this.event[eventName].push({
       type: _listenerType.THROTTLE,
       listener,
+      time,
     });
     this.eventKeys.add(eventName);
   }
 
-  emitThrottle = throttle((eventName, ...args) => {
+  emitThrottle(eventName, ...args) {
     const listeners = this.event[eventName] || [];
+    runAsyncGrnerator(function* () {
+      const leadingListeners = listeners.filter(
+        ({ type }) => type === _listenerType.THROTTLE
+      );
+
+      for (const listenerObj of leadingListeners) {
+        if (listenerObj.timeoutObj) continue;
+        listenerObj.timeoutObj = setTimeout(() => {
+          listenerObj.timeoutObj = "";
+        }, listenerObj.time);
+        yield runAsyncGrnerator(listenerObj.listener, ...args);
+      }
+    });
+  }
+
+  onTake(eventName, listener) {
+    if (!this.event[eventName]) {
+      this.event[eventName] = [];
+    }
+    this.event[eventName].push({
+      type: _listenerType.TAKE,
+      listener,
+    });
+    this.eventKeys.add(eventName);
+  }
+
+  emitTake(action) {
+    const listeners = this.event[action.type] || [];
     listeners
-      .filter(({ type }) => type === _listenerType.THROTTLE)
+      .filter(({ type }) => type === _listenerType.TAKE)
       .forEach(({ listener }) => {
-        runAsyncGrnerator(listener, ...args);
+        listener(action);
       });
-  }, 2000);
+  }
+
+  onLeading(eventName, listener) {
+    if (!this.event[eventName]) {
+      this.event[eventName] = [];
+    }
+    this.event[eventName].push({
+      type: _listenerType.TAKE_LEADING,
+      listener,
+    });
+    this.eventKeys.add(eventName);
+  }
+
+  emitLeading(eventName, ...args) {
+    const listeners = this.event[eventName] || [];
+    runAsyncGrnerator(function* () {
+      const leadingListeners = listeners.filter(
+        ({ type }) => type === _listenerType.TAKE_LEADING
+      );
+      for (const listenerObj of leadingListeners) {
+        if (listenerObj.leading) continue;
+        listenerObj.leading = true;
+        yield runAsyncGrnerator(listenerObj.listener, ...args);
+        listenerObj.leading = false;
+      }
+    });
+  }
 }

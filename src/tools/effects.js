@@ -29,6 +29,7 @@ export function call(func, ...args) {
   }
 }
 
+
 export function all(generators = []) {
   generators.forEach((generator) => {
     runAsyncIterator(generator);

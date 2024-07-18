@@ -1,8 +1,7 @@
-import { put, select, takeLeading } from "redux-saga/effects";
 import { FETCH_DATA_LIST } from "./constants";
 import { queryDataList } from "../service";
 import { setDataListAction } from "./actionCreators";
-import { call } from "../../../tools/effects";
+import { call, put,select, takeLeading } from "../../../tools/sagaMiddleWare";
 
 export function* dataSaga() {
   yield takeLeading(FETCH_DATA_LIST, function* () {
